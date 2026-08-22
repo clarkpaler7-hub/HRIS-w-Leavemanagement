@@ -55,6 +55,11 @@ export const api = {
         return user ? JSON.parse(user) : null;
     },
 
+    // Get the employee record linked to the current logged-in user
+    async getMyEmployee() {
+        return await request('GET', '/me/employee');
+    },
+
     // ---- Employees ----
     async listEmployees() {
         return await request('GET', '/employees');

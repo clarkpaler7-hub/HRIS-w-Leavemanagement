@@ -14,17 +14,15 @@ function Field({ label, value }: { label: string; value: string }) {
 export default function Staff_Profile() {
   const [employee, setEmployee] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-  const user = api.currentUser();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const employees = await api.listEmployees();
-        // Find employee linked to current user by email
-        const matched = employees.find((e: any) => e.email === user?.email);
-        setEmployee(matched || null);
+        const data = await api.getMyEmployee();
+        setEmployee(data);
       } catch (err) {
-        console.error('Failed to load profile', err);
+        setError(err instanceof Error ? err.message : 'Failed to load your profile.');
       } finally {
         setLoading(false);
       }
@@ -34,6 +32,10 @@ export default function Staff_Profile() {
 
   if (loading) {
     return <p className="text-sm text-ink-900/50">Loading profile...</p>;
+  }
+
+  if (error) {
+    return <p className="text-sm text-maroon-600">{error}</p>;
   }
 
   if (!employee) {
