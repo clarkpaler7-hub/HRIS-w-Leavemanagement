@@ -1,0 +1,265 @@
+import { useEffect, useRef, useState } from 'react';
+import {
+  Bell,
+  CircleCheck,
+  CircleX,
+  CalendarClock,
+  AlertTriangle,
+  UserPlus,
+  UserX,
+  Building2,
+} from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import type { Role } from '@/types';
+
+export type NotificationType =
+  | 'leave_approved'
+  | 'leave_rejected'
+  | 'leave_pending'
+  | 'attendance_late'
+  | 'attendance_absent'
+  | 'employee_added'
+  | 'department_alert';
+
+export interface NotificationItem {
+  id: number;
+  type: NotificationType;
+  title: string;
+  description: string;
+  time: string;
+  read: boolean;
+  /** Only set for leave_rejected — mirrors LeaveRequest.rejection_reason */
+  reason?: string;
+}
+
+const typeIcons: Record<NotificationType, typeof Bell> = {
+  leave_approved: CircleCheck,
+  leave_rejected: CircleX,
+  leave_pending: CalendarClock,
+  attendance_late: AlertTriangle,
+  attendance_absent: UserX,
+  employee_added: UserPlus,
+  department_alert: Building2,
+};
+
+const typeColors: Record<NotificationType, string> = {
+  leave_approved: 'text-maroon-500 dark:text-maroon-300',
+  leave_rejected: 'text-ink-900/60 dark:text-white/60',
+  leave_pending: 'text-gold-600 dark:text-gold-400',
+  attendance_late: 'text-gold-600 dark:text-gold-400',
+  attendance_absent: 'text-maroon-500 dark:text-maroon-300',
+  employee_added: 'text-maroon-500 dark:text-maroon-300',
+  department_alert: 'text-gold-600 dark:text-gold-400',
+};
+
+// ---- Role-specific notification content ----
+//
+// Each role only sees notifications relevant to what they actually do in
+// this system — this mirrors the admin/HR split already enforced by
+// RoleRoute: admin never touches leave, HR only touches leave, employees
+// only see their own outcomes.
+//
+// TODO: once the backend notifications endpoint exists, replace
+// `getMockNotificationsForRole` with something like:
+//   const data = await api.listNotifications();
+// The backend should already scope results to the authenticated user
+// (same pattern as /me/employee), so no role-branching would be needed
+// on the frontend at that point — this function goes away entirely and
+// `notifications` gets set directly from the response.
+
+const EMPLOYEE_NOTIFICATIONS: NotificationItem[] = [
+  {
+    id: 1,
+    type: 'leave_approved',
+    title: 'Leave request approved',
+    description: 'Your Annual Leave request (Aug 28–30) was approved by HR.',
+    time: '10 minutes ago',
+    read: false,
+  },
+  {
+    id: 2,
+    type: 'leave_rejected',
+    title: 'Leave request rejected',
+    description: 'Your Sick Leave request (Aug 15) was declined by HR.',
+    reason: 'Insufficient leave balance for the requested dates.',
+    time: 'Yesterday',
+    read: false,
+  },
+  {
+    id: 3,
+    type: 'leave_pending',
+    title: 'Leave request submitted',
+    description: 'Your Unpaid Leave request is awaiting review from HR.',
+    time: '2 days ago',
+    read: true,
+  },
+];
+
+const HR_NOTIFICATIONS: NotificationItem[] = [
+  {
+    id: 1,
+    type: 'leave_pending',
+    title: 'New leave request',
+    description: 'Jamie Chen submitted a new Annual Leave request — needs your review.',
+    time: '15 minutes ago',
+    read: false,
+  },
+  {
+    id: 2,
+    type: 'leave_pending',
+    title: 'New leave request',
+    description: 'Taylor Morgan submitted a Sick Leave request for tomorrow.',
+    time: '1 hour ago',
+    read: false,
+  },
+  {
+    id: 3,
+    type: 'leave_pending',
+    title: 'Pending requests reminder',
+    description: 'You have 3 leave requests awaiting review this week.',
+    time: 'Today, 9:00 AM',
+    read: true,
+  },
+];
+
+const ADMIN_NOTIFICATIONS: NotificationItem[] = [
+  {
+    id: 1,
+    type: 'attendance_late',
+    title: 'Late arrivals today',
+    description: '3 employees clocked in after 9:00 AM today.',
+    time: '30 minutes ago',
+    read: false,
+  },
+  {
+    id: 2,
+    type: 'attendance_absent',
+    title: 'Absences today',
+    description: '2 employees have not clocked in and have no approved leave on file.',
+    time: '1 hour ago',
+    read: false,
+  },
+  {
+    id: 3,
+    type: 'employee_added',
+    title: 'New employee added',
+    description: 'Priya Santos was added to the Human Resources department.',
+    time: 'Yesterday',
+    read: true,
+  },
+  {
+    id: 4,
+    type: 'department_alert',
+    title: 'Low department headcount',
+    description: "The 'Sales' department currently has 0 active employees.",
+    time: '2 days ago',
+    read: true,
+  },
+];
+
+function getMockNotificationsForRole(role: Role): NotificationItem[] {
+  if (role === 'admin') return ADMIN_NOTIFICATIONS;
+  if (role === 'hr') return HR_NOTIFICATIONS;
+  return EMPLOYEE_NOTIFICATIONS;
+}
+
+export default function NotificationBell() {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationItem[]>(() =>
+    getMockNotificationsForRole(user?.role ?? 'employee')
+  );
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  // Close the dropdown when clicking anywhere outside of it.
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const markAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        onClick={() => setOpen((prev) => !prev)}
+        aria-label="Notifications"
+        className="relative rounded-md p-2 text-ink-900/70 transition-colors hover:bg-maroon-50 hover:text-maroon-600 dark:text-white/70 dark:hover:bg-ink-700 dark:hover:text-maroon-300"
+      >
+        <Bell aria-hidden className="h-5 w-5" />
+        {unreadCount > 0 && (
+          <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-maroon-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-ink-800">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
+        )}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-lg border border-ink-900/10 bg-white shadow-lg dark:border-white/10 dark:bg-ink-800">
+          <div className="flex items-center justify-between border-b border-gold-300 px-4 py-3 dark:border-ink-700">
+            <h3 className="font-display text-sm font-bold text-ink-900 dark:text-white">
+              Notifications
+            </h3>
+            {unreadCount > 0 && (
+              <button
+                onClick={markAllRead}
+                className="text-xs font-medium text-maroon-600 hover:underline dark:text-maroon-300"
+              >
+                Mark all read
+              </button>
+            )}
+          </div>
+
+          <ul className="max-h-80 overflow-y-auto">
+            {notifications.length === 0 && (
+              <li className="px-4 py-6 text-center text-sm text-ink-900/40 dark:text-white/40">
+                No notifications right now.
+              </li>
+            )}
+            {notifications.map((n) => {
+              const Icon = typeIcons[n.type];
+              return (
+                <li
+                  key={n.id}
+                  className={`flex gap-3 border-b border-ink-900/5 px-4 py-3 last:border-b-0 dark:border-white/5 ${
+                    n.read ? '' : 'bg-maroon-50/50 dark:bg-maroon-500/10'
+                  }`}
+                >
+                  <Icon aria-hidden className={`mt-0.5 h-4 w-4 shrink-0 ${typeColors[n.type]}`} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-medium text-ink-900 dark:text-white">{n.title}</p>
+                      {!n.read && (
+                        <span
+                          aria-hidden
+                          className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold-400"
+                        />
+                      )}
+                    </div>
+                    <p className="mt-0.5 text-xs text-ink-900/60 dark:text-white/60">{n.description}</p>
+                    {n.reason && (
+                      <p className="mt-1 rounded bg-ink-900/5 px-2 py-1 text-xs italic text-ink-900/70 dark:bg-white/5 dark:text-white/70">
+                        <span className="font-semibold not-italic">Reason: </span>
+                        {n.reason}
+                      </p>
+                    )}
+                    <p className="mt-1 text-[11px] text-ink-900/35 dark:text-white/35">{n.time}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}

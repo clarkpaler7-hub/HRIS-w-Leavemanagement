@@ -3,6 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import TccLogo from '@/Images/TccLogo.jpg';
 import type { Role } from '@/types';
+import NotificationBell from '@/components/NotificationBell';
 import {
   LayoutDashboard,
   Building2,
@@ -136,7 +137,7 @@ export default function Layout() {
       </aside>
 
       <main className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-[#faf9f7] dark:bg-ink-900">
-        <div className="flex items-center border-b border-gold-300 bg-white px-6 py-3 dark:border-ink-700 dark:bg-ink-800">
+        <div className="flex items-center justify-between border-b border-gold-300 bg-white px-6 py-3 dark:border-ink-700 dark:bg-ink-800">
           <button
             onClick={() => setSidebarOpen((prev) => !prev)}
             aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
@@ -144,6 +145,8 @@ export default function Layout() {
           >
             <Menu aria-hidden className="h-5 w-5" />
           </button>
+
+          <NotificationBell />
         </div>
         <div className="mx-auto w-full max-w-6xl flex-1 px-8 py-8">
           <Outlet />
