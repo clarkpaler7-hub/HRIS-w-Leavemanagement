@@ -94,7 +94,7 @@ export default function App() {
             />
 
 
-            {/* For Staff users */}
+            {/* For HR users */}
             <Route 
               path="HRLeaveRequests" 
               element={

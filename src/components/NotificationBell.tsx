@@ -59,103 +59,23 @@ const typeColors: Record<NotificationType, string> = {
 // RoleRoute: admin never touches leave, HR only touches leave, employees
 // only see their own outcomes.
 //
-// TODO: once the backend notifications endpoint exists, replace
-// `getMockNotificationsForRole` with something like:
+// TODO: replace `getMockNotificationsForRole` with a real fetch once the
+// backend notifications endpoint exists — e.g.:
 //   const data = await api.listNotifications();
 // The backend should already scope results to the authenticated user
 // (same pattern as /me/employee), so no role-branching would be needed
 // on the frontend at that point — this function goes away entirely and
 // `notifications` gets set directly from the response.
+//
+// These arrays are intentionally left empty for now — the bell, badge,
+// dropdown, and "mark all read" logic all still work, they just have
+// nothing to show until real data is wired in.
 
-const EMPLOYEE_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: 1,
-    type: 'leave_approved',
-    title: 'Leave request approved',
-    description: 'Your Annual Leave request (Aug 28–30) was approved by HR.',
-    time: '10 minutes ago',
-    read: false,
-  },
-  {
-    id: 2,
-    type: 'leave_rejected',
-    title: 'Leave request rejected',
-    description: 'Your Sick Leave request (Aug 15) was declined by HR.',
-    reason: 'Insufficient leave balance for the requested dates.',
-    time: 'Yesterday',
-    read: false,
-  },
-  {
-    id: 3,
-    type: 'leave_pending',
-    title: 'Leave request submitted',
-    description: 'Your Unpaid Leave request is awaiting review from HR.',
-    time: '2 days ago',
-    read: true,
-  },
-];
+const EMPLOYEE_NOTIFICATIONS: NotificationItem[] = [];
 
-const HR_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: 1,
-    type: 'leave_pending',
-    title: 'New leave request',
-    description: 'Jamie Chen submitted a new Annual Leave request — needs your review.',
-    time: '15 minutes ago',
-    read: false,
-  },
-  {
-    id: 2,
-    type: 'leave_pending',
-    title: 'New leave request',
-    description: 'Taylor Morgan submitted a Sick Leave request for tomorrow.',
-    time: '1 hour ago',
-    read: false,
-  },
-  {
-    id: 3,
-    type: 'leave_pending',
-    title: 'Pending requests reminder',
-    description: 'You have 3 leave requests awaiting review this week.',
-    time: 'Today, 9:00 AM',
-    read: true,
-  },
-];
+const HR_NOTIFICATIONS: NotificationItem[] = [];
 
-const ADMIN_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: 1,
-    type: 'attendance_late',
-    title: 'Late arrivals today',
-    description: '3 employees clocked in after 9:00 AM today.',
-    time: '30 minutes ago',
-    read: false,
-  },
-  {
-    id: 2,
-    type: 'attendance_absent',
-    title: 'Absences today',
-    description: '2 employees have not clocked in and have no approved leave on file.',
-    time: '1 hour ago',
-    read: false,
-  },
-  {
-    id: 3,
-    type: 'employee_added',
-    title: 'New employee added',
-    description: 'Priya Santos was added to the Human Resources department.',
-    time: 'Yesterday',
-    read: true,
-  },
-  {
-    id: 4,
-    type: 'department_alert',
-    title: 'Low department headcount',
-    description: "The 'Sales' department currently has 0 active employees.",
-    time: '2 days ago',
-    read: true,
-  },
-];
+const ADMIN_NOTIFICATIONS: NotificationItem[] = [];
 
 function getMockNotificationsForRole(role: Role): NotificationItem[] {
   if (role === 'admin') return ADMIN_NOTIFICATIONS;
