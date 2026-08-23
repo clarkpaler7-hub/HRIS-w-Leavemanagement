@@ -32,6 +32,7 @@ const employeeNavItems = [
 const hrNavItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/HRLeaveRequests', label: 'Leave Management', icon: CalendarCheck },
+  { to: '/attendance', label: 'Attendance Monitoring', icon: Clock },
 ];
 
 const roleLabels: Record<string, string> = {

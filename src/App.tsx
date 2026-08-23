@@ -60,7 +60,7 @@ export default function App() {
             <Route 
               path="attendance" 
               element={
-                <RoleRoute allow={['admin']}>
+                <RoleRoute allow={['admin', 'hr']}>
                   <Attendance />
                 </RoleRoute>
               } 
