@@ -64,8 +64,6 @@ export default function Staff_Profile() {
           <Field label="Department" value={employee.department ?? '—'} />
           <Field label="Position" value={employee.position ?? '—'} />
           <Field label="Hire Date" value={employee.date_hired} />
-          <Field label="Hourly Rate" value={`₱${employee.hourly_rate}`} />
-          <Field label="Daily Rate" value={`₱${employee.daily_rate}`} />
         </div>
       </Card>
 

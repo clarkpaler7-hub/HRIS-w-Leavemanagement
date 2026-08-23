@@ -38,7 +38,6 @@ export default function StaffAttendance() {
             <span>Time In: <strong>{todayRecord.time_in ?? '—'}</strong></span>
             <span>Time Out: <strong>{todayRecord.time_out ?? '—'}</strong></span>
             <span>Late: <strong>{todayRecord.late_minutes} mins</strong></span>
-            <span>Deduction: <strong>₱{todayRecord.late_deduction}</strong></span>
             <span>Status: <strong>{todayRecord.status}</strong></span>
           </div>
         </div>
@@ -52,21 +51,20 @@ export default function StaffAttendance() {
               <th className="px-4 py-3">Time In</th>
               <th className="px-4 py-3">Time Out</th>
               <th className="px-4 py-3">Late (mins)</th>
-              <th className="px-4 py-3">Deduction</th>
               <th className="px-4 py-3">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-ink-900/5">
             {loading && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-ink-900/40">
+                <td colSpan={5} className="px-4 py-6 text-center text-ink-900/40">
                   Loading...
                 </td>
               </tr>
             )}
             {!loading && records.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-ink-900/40">
+                <td colSpan={5} className="px-4 py-6 text-center text-ink-900/40">
                   No attendance records yet.
                 </td>
               </tr>
@@ -77,7 +75,6 @@ export default function StaffAttendance() {
                 <td className="px-4 py-3 text-ink-900/70">{r.time_in ?? '—'}</td>
                 <td className="px-4 py-3 text-ink-900/70">{r.time_out ?? '—'}</td>
                 <td className="px-4 py-3 text-ink-900/70">{r.late_minutes}</td>
-                <td className="px-4 py-3 text-ink-900/70">₱{r.late_deduction}</td>
                 <td className="px-4 py-3">
                   <StatusBadge status={r.status} />
                 </td>

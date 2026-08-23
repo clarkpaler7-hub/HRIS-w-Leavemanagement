@@ -9,8 +9,7 @@ import {
   UserX,
   Building2,
 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import type { Role } from '@/types';
+import { api } from '@/lib/api';
 
 export type NotificationType =
   | 'leave_approved'
@@ -71,29 +70,57 @@ const typeColors: Record<NotificationType, string> = {
 // dropdown, and "mark all read" logic all still work, they just have
 // nothing to show until real data is wired in.
 
-const EMPLOYEE_NOTIFICATIONS: NotificationItem[] = [];
+interface BackendNotification {
+  id: number;
+  title: string;
+  message: string;
+  type: NotificationType | null;
+  is_read: boolean;
+  created_at: string;
+}
 
-const HR_NOTIFICATIONS: NotificationItem[] = [];
-
-const ADMIN_NOTIFICATIONS: NotificationItem[] = [];
-
-function getMockNotificationsForRole(role: Role): NotificationItem[] {
-  if (role === 'admin') return ADMIN_NOTIFICATIONS;
-  if (role === 'hr') return HR_NOTIFICATIONS;
-  return EMPLOYEE_NOTIFICATIONS;
+function timeAgo(dateStr: string): string {
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
 }
 
 export default function NotificationBell() {
-  const { user } = useAuth();
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationItem[]>(() =>
-    getMockNotificationsForRole(user?.role ?? 'employee')
-  );
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  // Close the dropdown when clicking anywhere outside of it.
+  const mapNotification = (n: BackendNotification): NotificationItem => ({
+    id: n.id,
+    type: n.type ?? 'leave_pending',
+    title: n.title,
+    description: n.message,
+    time: timeAgo(n.created_at),
+    read: n.is_read,
+  });
+
+  const loadNotifications = async () => {
+    try {
+      const data = await api.listNotifications();
+      setNotifications(data.map(mapNotification));
+    } catch (err) {
+      console.error('Failed to load notifications', err);
+    }
+  };
+
+  useEffect(() => {
+    loadNotifications();
+    const interval = setInterval(loadNotifications, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -104,8 +131,22 @@ export default function NotificationBell() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const markAllRead = () => {
+  const markAllRead = async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    try {
+      await api.markAllNotificationsRead();
+    } catch (err) {
+      console.error('Failed to mark all notifications read', err);
+    }
+  };
+
+  const markOneRead = async (id: number) => {
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    try {
+      await api.markNotificationRead(id);
+    } catch (err) {
+      console.error('Failed to mark notification read', err);
+    }
   };
 
   return (
@@ -150,9 +191,10 @@ export default function NotificationBell() {
               return (
                 <li
                   key={n.id}
-                  className={`flex gap-3 border-b border-ink-900/5 px-4 py-3 last:border-b-0 dark:border-white/5 ${
+                    className={`flex cursor-pointer gap-3 border-b border-ink-900/5 px-4 py-3 last:border-b-0 dark:border-white/5 ${
                     n.read ? '' : 'bg-maroon-50/50 dark:bg-maroon-500/10'
                   }`}
+                  onClick={() => !n.read && markOneRead(n.id)}
                 >
                   <Icon aria-hidden className={`mt-0.5 h-4 w-4 shrink-0 ${typeColors[n.type]}`} />
                   <div className="min-w-0 flex-1">

@@ -116,7 +116,20 @@ export const api = {
         return await request('POST', `/leave-requests/${id}/approve`, { hr_remarks });
     },
 
-    async rejectLeaveRequest(id: number, hr_remarks?: string) {
+        async rejectLeaveRequest(id: number, hr_remarks?: string) {
         return await request('POST', `/leave-requests/${id}/reject`, { hr_remarks });
+    },
+
+    // ---- Notifications ----
+    async listNotifications() {
+        return await request('GET', '/notifications');
+    },
+
+    async markNotificationRead(id: number) {
+        return await request('POST', `/notifications/${id}/read`);
+    },
+
+    async markAllNotificationsRead() {
+        return await request('POST', '/notifications/read-all');
     },
 };

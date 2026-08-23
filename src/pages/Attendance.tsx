@@ -38,21 +38,20 @@ export default function AttendancePage() {
               <th className="px-4 py-3">Time In</th>
               <th className="px-4 py-3">Time Out</th>
               <th className="px-4 py-3">Late (mins)</th>
-              <th className="px-4 py-3">Late Deduction</th>
               <th className="px-4 py-3">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-ink-900/5">
             {loading && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-ink-900/40">
+                <td colSpan={6} className="px-4 py-6 text-center text-ink-900/40">
                   Loading...
                 </td>
               </tr>
             )}
             {!loading && records.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-ink-900/40">
+                <td colSpan={6} className="px-4 py-6 text-center text-ink-900/40">
                   No attendance records for today.
                 </td>
               </tr>
@@ -64,7 +63,6 @@ export default function AttendancePage() {
                 <td className="px-4 py-3 text-ink-900/70">{r.time_in ?? '—'}</td>
                 <td className="px-4 py-3 text-ink-900/70">{r.time_out ?? '—'}</td>
                 <td className="px-4 py-3 text-ink-900/70">{r.late_minutes}</td>
-                <td className="px-4 py-3 text-ink-900/70">₱{r.late_deduction}</td>
                 <td className="px-4 py-3">
                   <StatusBadge status={r.status} />
                 </td>

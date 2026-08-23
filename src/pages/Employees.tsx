@@ -14,8 +14,6 @@ const emptyForm = {
   position: '',
   department: '',
   date_hired: '',
-  hourly_rate: '',
-  daily_rate: '',
   employment_type: 'full_time' as EmploymentType,
 };
 
@@ -66,8 +64,6 @@ export default function Employees() {
         position: form.position,
         department: form.department,
         date_hired: form.date_hired,
-        hourly_rate: form.hourly_rate,
-        daily_rate: form.daily_rate,
       });
       setModalOpen(false);
       setForm(emptyForm);
@@ -189,24 +185,6 @@ export default function Employees() {
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               className="col-span-2 rounded-md border border-ink-900/15 px-3 py-2 text-sm"
-            />
-            <input
-              required
-              type="number"
-              step="0.01"
-              placeholder="Hourly Rate"
-              value={form.hourly_rate}
-              onChange={(e) => setForm({ ...form, hourly_rate: e.target.value })}
-              className="rounded-md border border-ink-900/15 px-3 py-2 text-sm"
-            />
-            <input
-              required
-              type="number"
-              step="0.01"
-              placeholder="Daily Rate"
-              value={form.daily_rate}
-              onChange={(e) => setForm({ ...form, daily_rate: e.target.value })}
-              className="rounded-md border border-ink-900/15 px-3 py-2 text-sm"
             />
             <input
               required
