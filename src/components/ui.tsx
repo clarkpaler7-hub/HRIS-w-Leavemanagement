@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { AlertCircle } from 'lucide-react';
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
@@ -85,7 +86,7 @@ export function Modal({
 }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/60 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/10 backdrop-blur-md p-4">
       <div className="w-full max-w-lg rounded-lg border-t-4 border-t-gold-400 bg-white p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-display text-xl font-bold text-ink-900">{title}</h2>
@@ -98,6 +99,37 @@ export function Modal({
           </button>
         </div>
         {children}
+      </div>
+    </div>
+  );
+}
+export function RejectionReasonModal({
+  open,
+  onClose,
+  reason,
+}: {
+  open: boolean;
+  onClose: () => void;
+  reason: string;
+}) {
+  if (!open) return null;
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-white/10 backdrop-blur-md p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-sm rounded-lg border-t-4 border-t-gold-400 bg-white p-6 text-center shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border-2 border-ink-900">
+          <AlertCircle className="h-6 w-6 text-ink-900" strokeWidth={2} />
+        </div>
+        <h2 className="mb-2 font-display text-xl font-bold text-ink-900">Rejection Reason</h2>
+        <p className="mb-5 whitespace-pre-wrap text-sm text-ink-900/70">{reason}</p>
+        <Button type="button" variant="secondary" onClick={onClose} className="w-full">
+          Close
+        </Button>
       </div>
     </div>
   );

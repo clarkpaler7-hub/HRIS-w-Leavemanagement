@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { api } from '@/lib/api';
-import { Button, Card, Modal, StatusBadge } from '@/components/ui';
+import { Button, Card, Modal, RejectionReasonModal, StatusBadge } from '@/components/ui';
 
 export default function StaffLeaveRequests() {
   const [requests, setRequests] = useState<any[]>([]);
@@ -9,6 +9,7 @@ export default function StaffLeaveRequests() {
   const [form, setForm] = useState({ leave_type_id: '', start_date: '', end_date: '', reason: '' });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reasonModal, setReasonModal] = useState<string | null>(null);
 
   const load = async () => {
     try {
@@ -106,7 +107,13 @@ export default function StaffLeaveRequests() {
                 <td className="px-4 py-3 text-ink-900/70">{r.total_days}</td>
                 <td className="px-4 py-3 text-ink-900/70">{r.reason ?? '—'}</td>
                 <td className="px-4 py-3">
-                  <StatusBadge status={r.status} />
+                  {r.status === 'rejected' && r.hr_remarks ? (
+                    <button onClick={() => setReasonModal(r.hr_remarks)} className="cursor-pointer">
+                      <StatusBadge status={r.status} />
+                    </button>
+                  ) : (
+                    <StatusBadge status={r.status} />
+                  )}
                 </td>
               </tr>
             ))}
@@ -161,6 +168,11 @@ export default function StaffLeaveRequests() {
           </div>
         </form>
       </Modal>
+      <RejectionReasonModal
+        open={!!reasonModal}
+        onClose={() => setReasonModal(null)}
+        reason={reasonModal ?? ''}
+      />
     </div>
   );
 }
