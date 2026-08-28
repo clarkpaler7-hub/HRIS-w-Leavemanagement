@@ -33,6 +33,8 @@ const statusStyles: Record<string, string> = {
   approved: 'bg-maroon-50 text-maroon-600 ring-1 ring-inset ring-maroon-200',
   paid: 'bg-maroon-50 text-maroon-600 ring-1 ring-inset ring-maroon-200',
   pending: 'bg-gold-100 text-gold-700 ring-1 ring-inset ring-gold-300',
+  endorsed: 'bg-gold-100 text-gold-700 ring-1 ring-inset ring-gold-300',
+  for_review: 'bg-gold-100 text-gold-700 ring-1 ring-inset ring-gold-300',
   on_leave: 'bg-gold-100 text-gold-700 ring-1 ring-inset ring-gold-300',
   half_day: 'bg-gold-100 text-gold-700 ring-1 ring-inset ring-gold-300',
   late: 'bg-gold-100 text-gold-700 ring-1 ring-inset ring-gold-300',

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import DesktopOnlyNotice from '@/components/DesktopOnlyNotice';
 import TccLogo from '@/Images/TccLogo.jpg';
 import type { Role } from '@/types';
 import NotificationBell from '@/components/NotificationBell';
@@ -50,13 +52,37 @@ function navItemsFor(role: Role) {
 export default function Layout() {
   const { user, logout } = useAuth();
   const navItems = navItemsFor(user?.role ?? 'employee');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+
+  // Keep the sidebar state sane if the viewport crosses the mobile
+  // breakpoint mid-session (e.g. rotating a tablet, resizing a window).
+  useEffect(() => {
+    setSidebarOpen(!isMobile);
+  }, [isMobile]);
+
+  // Employees are fully supported on mobile. Admin and HR manage sensitive,
+  // data-dense workflows (employee records, payroll-adjacent leave approvals)
+  // that aren't safe or usable on a small screen, so they're gated to desktop.
+  if (isMobile && user?.role !== 'employee') {
+    return <DesktopOnlyNotice />;
+  }
 
   return (
     <div className="flex min-h-screen bg-white dark:bg-ink-900">
+      {/* Backdrop, mobile only — closes the drawer when tapped outside it */}
+      {isMobile && sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-ink-900/30 backdrop-blur-sm md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <aside
-        className={`shrink-0 overflow-hidden border-r border-gold-300 bg-gold-50 text-ink-900 transition-all duration-300 ease-in-out dark:border-ink-700 dark:bg-ink-800 dark:text-white ${
-          sidebarOpen ? 'w-64' : 'w-20'
+        className={`fixed inset-y-0 left-0 z-40 shrink-0 overflow-hidden border-r border-gold-300 bg-gold-50 text-ink-900 transition-all duration-300 ease-in-out dark:border-ink-700 dark:bg-ink-800 dark:text-white md:static md:z-auto ${
+          isMobile
+            ? `w-64 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`
+            : `translate-x-0 ${sidebarOpen ? 'w-64' : 'w-20'}`
         }`}
       >
         <div className="flex h-full flex-col">
@@ -138,7 +164,7 @@ export default function Layout() {
       </aside>
 
       <main className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-[#faf9f7] dark:bg-ink-900">
-        <div className="flex items-center justify-between border-b border-gold-300 bg-white px-6 py-3 dark:border-ink-700 dark:bg-ink-800">
+        <div className="flex items-center justify-between border-b border-gold-300 bg-white px-4 py-3 dark:border-ink-700 dark:bg-ink-800 sm:px-6">
           <button
             onClick={() => setSidebarOpen((prev) => !prev)}
             aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
@@ -149,7 +175,7 @@ export default function Layout() {
 
           <NotificationBell />
         </div>
-        <div className="mx-auto w-full max-w-6xl flex-1 px-8 py-8">
+        <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 md:px-8 md:py-8">
           <Outlet />
         </div>
       </main>

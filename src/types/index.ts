@@ -55,7 +55,7 @@ export interface LeaveType {
   is_paid: boolean;
 }
 
-export type LeaveStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+export type LeaveStatus = 'pending' | 'endorsed' | 'for_review' | 'approved' | 'rejected' | 'cancelled';
 
 export interface LeaveRequest {
   id: number;
