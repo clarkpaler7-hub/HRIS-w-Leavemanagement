@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Clock, CheckCircle2, XCircle } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Card, StatCard, StatusBadge } from '@/components/ui';
 
@@ -52,9 +53,9 @@ export default function HRDashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="Pending Requests" value={pendingRequests.length} />
-        <StatCard label="Approved This Month" value={approvedThisMonth} />
-        <StatCard label="Rejected This Month" value={rejectedThisMonth} />
+        <StatCard label="Pending Requests" value={pendingRequests.length} icon={Clock} />
+        <StatCard label="Approved This Month" value={approvedThisMonth} icon={CheckCircle2} />
+        <StatCard label="Rejected This Month" value={rejectedThisMonth} icon={XCircle} />
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

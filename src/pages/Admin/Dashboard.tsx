@@ -4,20 +4,17 @@ import { Card, StatCard } from '@/components/ui';
 
 export default function Dashboard() {
   const [employees, setEmployees] = useState<any[]>([]);
-  const [requests, setRequests] = useState<any[]>([]);
   const [attendance, setAttendance] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [emps, reqs, att] = await Promise.all([
-          api.listEmployees(),
-          api.listLeaveRequests(),
-          api.listAttendance(),
-        ]);
+          const [emps, att] = await Promise.all([
+            api.listEmployees(),
+            api.listAttendance(),
+          ]);
         setEmployees(emps);
-        setRequests(reqs);
         setAttendance(att);
       } catch (err) {
         console.error('Failed to load dashboard', err);
@@ -34,7 +31,6 @@ export default function Dashboard() {
   const todayAttendance = attendance.filter((a) => a.date === today);
   const presentToday = todayAttendance.filter((a) => a.status === 'present' || a.status === 'late').length;
   const absentToday = todayAttendance.filter((a) => a.status === 'absent').length;
-  const pendingLeave = requests.filter((r) => r.status === 'pending').length;
 
   // Group employees by department
   const departmentMap: Record<string, number> = {};
@@ -57,14 +53,9 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatCard label="Active Employees" value={employees.filter((e) => e.status === 'active').length} />
         <StatCard label="Departments" value={Object.keys(departmentMap).length} />
-        <StatCard label="Pending Leave" value={pendingLeave} />
-        <StatCard
-          label="Present Today"
-          value={presentToday}
-          hint={`${absentToday} absent`}
-        />
-      </div>
-
+        <StatCard label="Today's Absent" value={absentToday} />
+        <StatCard label="Today's Present" value={presentToday} />
+      </div>  
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
           <h2 className="mb-3 font-display text-lg font-bold text-maroon-600">

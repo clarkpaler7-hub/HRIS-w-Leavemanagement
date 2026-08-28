@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { AlertCircle } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
@@ -13,16 +14,27 @@ export function StatCard({
   label,
   value,
   hint,
+  icon: Icon,
 }: {
   label: string;
   value: string | number;
   hint?: string;
+  icon?: LucideIcon;
 }) {
   return (
     <Card className="relative overflow-hidden border-t-2 border-t-gold-400 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <p className="text-xs font-medium uppercase tracking-wide text-maroon-500">{label}</p>
-      <p className="mt-1 font-display text-3xl font-bold text-ink-900">{value}</p>
-      {hint && <p className="mt-1 text-xs text-ink-900/50">{hint}</p>}
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-maroon-500">{label}</p>
+          <p className="mt-1 font-display text-3xl font-bold text-ink-900">{value}</p>
+          {hint && <p className="mt-1 text-xs text-ink-900/50">{hint}</p>}
+        </div>
+        {Icon && (
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-maroon-50 text-maroon-500">
+            <Icon className="h-5 w-5" strokeWidth={2} />
+          </span>
+        )}
+      </div>
     </Card>
   );
 }
