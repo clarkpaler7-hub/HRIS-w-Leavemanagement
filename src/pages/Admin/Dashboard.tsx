@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { Users, Building2, UserX, UserCheck } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Card, StatCard } from '@/components/ui';
+import { GreetingBanner } from '@/components/Greetingbanner';
 
 export default function Dashboard() {
   const [employees, setEmployees] = useState<any[]>([]);
@@ -45,16 +47,21 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-bold text-ink-900">Admin Dashboard</h1>
-        <p className="text-sm text-ink-900/50">Overview of your organization</p>
-      </div>
+      <GreetingBanner
+        name={api.currentUser()?.name}
+        subtitle="Here's your organization overview for today"
+        stats={[
+          { label: 'Present', value: presentToday },
+          { label: 'Absent', value: absentToday },
+          { label: 'Employees', value: employees.filter((e) => e.status === 'active').length },
+        ]}
+      />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatCard label="Active Employees" value={employees.filter((e) => e.status === 'active').length} />
-        <StatCard label="Departments" value={Object.keys(departmentMap).length} />
-        <StatCard label="Today's Absent" value={absentToday} />
-        <StatCard label="Today's Present" value={presentToday} />
+        <StatCard label="Active Employees" value={employees.filter((e) => e.status === 'active').length} icon={Users} />
+        <StatCard label="Departments" value={Object.keys(departmentMap).length} icon={Building2} />
+        <StatCard label="Today's Absent" value={absentToday} icon={UserX} />
+        <StatCard label="Today's Present" value={presentToday} icon={UserCheck} />
       </div>  
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { Clock, Hourglass, Palmtree } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Card, StatCard, StatusBadge } from '@/components/ui';
+import { GreetingBanner } from '@/components/Greetingbanner';
 
 export default function StaffDashboard() {
   const [leaveBalances, setLeaveBalances] = useState<any[]>([]);
@@ -9,6 +11,7 @@ export default function StaffDashboard() {
   const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showAllLeaves, setShowAllLeaves] = useState(false);
+  const [showAllRequests, setShowAllRequests] = useState(false);
   const user = api.currentUser();
   const PRIMARY_LEAVE_TYPES = ['Vacation Leave', 'Sick Leave', 'Mandatory/Forced Leave', 'Special Privilege Leave'];
 
@@ -22,7 +25,7 @@ export default function StaffDashboard() {
         ]);
 
         setLeaveBalances(balances);
-        setRecentRequests(requests.slice(0, 5));
+        setRecentRequests(requests);
         setPendingCount(requests.filter((r: any) => r.status === 'pending').length);
 
         const today = new Date().toISOString().slice(0, 10);
@@ -46,12 +49,22 @@ export default function StaffDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-bold text-ink-900">
-          Welcome, {user?.name}
-        </h1>
-        <p className="text-sm text-ink-900/50">Here's where things stand today</p>
-      </div>
+      <GreetingBanner
+        name={user?.name}
+        subtitle="Here's where things stand today"
+        stats={[
+          {
+            label: 'Status',
+            value: todayAttendance
+              ? todayAttendance.time_out
+                ? 'Timed Out'
+                : 'Timed In'
+              : 'Not Timed In',
+          },
+          { label: 'Pending', value: pendingCount },
+          { label: 'Leave Left', value: annualLeave?.remaining_days ?? '—' },
+        ]}
+      />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         <StatCard
@@ -64,16 +77,18 @@ export default function StaffDashboard() {
               : 'Not Timed In'
           }
           hint={todayAttendance?.time_in ? `In at ${todayAttendance.time_in}` : undefined}
+          icon={Clock}
         />
-        <StatCard label="Pending Requests" value={pendingCount} />
+        <StatCard label="Pending Requests" value={pendingCount} icon={Hourglass} />
         <StatCard
           label="Vacation Leave Left"
           value={annualLeave?.remaining_days ?? '—'}
           hint="days remaining"
+          icon={Palmtree}
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
         <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
           <h2 className="mb-3 font-display text-lg font-bold text-maroon-600">Leave Balances</h2>
 
@@ -102,15 +117,8 @@ export default function StaffDashboard() {
 
           {leaveBalances.some((b) => !PRIMARY_LEAVE_TYPES.includes(b.leave_type?.name)) && (
             <>
-              <button
-                onClick={() => setShowAllLeaves((prev) => !prev)}
-                className="mt-4 text-xs font-medium text-maroon-600 hover:underline"
-              >
-                {showAllLeaves ? 'Show less' : 'Show all leave types'}
-              </button>
-
               {showAllLeaves && (
-                <div className="mt-3 grid grid-cols-2 gap-2 border-t border-ink-900/10 pt-3">
+                <div className="mt-3 grid grid-cols-2 gap-2">
                   {leaveBalances
                     .filter((b) => !PRIMARY_LEAVE_TYPES.includes(b.leave_type?.name))
                     .map((b) => (
@@ -124,6 +132,12 @@ export default function StaffDashboard() {
                     ))}
                 </div>
               )}
+              <button
+                onClick={() => setShowAllLeaves((prev) => !prev)}
+                className="mt-4 text-xs font-medium text-maroon-600 hover:underline"
+              >
+                {showAllLeaves ? 'Show less' : 'Show more'}
+              </button>
             </>
           )}
         </Card>
@@ -136,7 +150,7 @@ export default function StaffDashboard() {
             {recentRequests.length === 0 && (
               <p className="text-sm text-ink-900/40">You haven't submitted any requests yet.</p>
             )}
-            {recentRequests.map((r) => (
+            {(showAllRequests ? recentRequests : recentRequests.slice(0, 5)).map((r) => (
               <li key={r.id} className="flex items-center justify-between text-sm">
                 <div>
                   <p className="font-medium text-ink-900">{r.leave_type?.name}</p>
@@ -148,6 +162,14 @@ export default function StaffDashboard() {
               </li>
             ))}
           </ul>
+          {recentRequests.length > 5 && (
+            <button
+              onClick={() => setShowAllRequests((prev) => !prev)}
+              className="mt-4 text-xs font-medium text-maroon-600 hover:underline"
+            >
+              {showAllRequests ? 'Show less' : 'Show more'}
+            </button>
+          )}
         </Card>
       </div>
     </div>

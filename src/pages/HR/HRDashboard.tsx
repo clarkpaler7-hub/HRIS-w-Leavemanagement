@@ -3,11 +3,15 @@ import { Link } from 'react-router-dom';
 import { Clock, CheckCircle2, XCircle } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Card, StatCard, StatusBadge } from '@/components/ui';
+import { GreetingBanner } from '@/components/Greetingbanner';
 
 export default function HRDashboard() {
   const [requests, setRequests] = useState<any[]>([]);
   const [leaveTypes, setLeaveTypes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAllTypes, setShowAllTypes] = useState(false);
+  const [showAllPending, setShowAllPending] = useState(false);
+  const PRIMARY_LEAVE_TYPES = ['Vacation Leave', 'Sick Leave', 'Mandatory/Forced Leave', 'Special Privilege Leave'];
 
   useEffect(() => {
     const load = async () => {
@@ -47,10 +51,15 @@ export default function HRDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-bold text-ink-900">Leave Management</h1>
-        <p className="text-sm text-ink-900/50">Review and process time-off requests</p>
-      </div>
+      <GreetingBanner
+        name={api.currentUser()?.name}
+        subtitle="Review and process time-off requests"
+        stats={[
+          { label: 'Pending', value: pendingRequests.length },
+          { label: 'Approved', value: approvedThisMonth },
+          { label: 'Rejected', value: rejectedThisMonth },
+        ]}
+      />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard label="Pending Requests" value={pendingRequests.length} icon={Clock} />
@@ -58,30 +67,56 @@ export default function HRDashboard() {
         <StatCard label="Rejected This Month" value={rejectedThisMonth} icon={XCircle} />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
+        <Card className="min-h-[240px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
           <h2 className="mb-3 font-display text-lg font-bold text-maroon-600">By Leave Type</h2>
+
           <ul className="space-y-3">
-            {byLeaveType.map((row) => (
-              <li key={row.leave_type.id} className="text-sm">
-                <div className="flex items-center justify-between">
+            {byLeaveType
+              .filter((row) => PRIMARY_LEAVE_TYPES.includes(row.leave_type.name))
+              .map((row) => (
+                <li key={row.leave_type.id} className="flex items-center justify-between text-sm">
                   <span className="text-ink-900/70">{row.leave_type.name}</span>
-                  <span className="text-xs text-ink-900/40">
-                    {row.pending} pending · {row.approved_this_month} approved this month
+                  <span className="font-medium text-ink-900">
+                    {row.pending} pending, {row.approved_this_month} approved
                   </span>
-                </div>
-              </li>
-            ))}
+                </li>
+              ))}
           </ul>
+
+          {byLeaveType.some((row) => !PRIMARY_LEAVE_TYPES.includes(row.leave_type.name)) && (
+            <>
+              {showAllTypes && (
+                <ul className="mt-3 space-y-3">
+                  {byLeaveType
+                    .filter((row) => !PRIMARY_LEAVE_TYPES.includes(row.leave_type.name))
+                    .map((row) => (
+                      <li key={row.leave_type.id} className="flex items-center justify-between text-sm">
+                        <span className="text-ink-900/70">{row.leave_type.name}</span>
+                        <span className="font-medium text-ink-900">
+                          {row.pending} pending, {row.approved_this_month} approved
+                        </span>
+                      </li>
+                    ))}
+                </ul>
+              )}
+              <button
+                onClick={() => setShowAllTypes((prev) => !prev)}
+                className="mt-4 text-xs font-medium text-maroon-600 hover:underline"
+              >
+                {showAllTypes ? 'Show less' : 'Show more'}
+              </button>
+            </>
+          )}
         </Card>
 
-        <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+        <Card className="min-h-[240px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
           <h2 className="mb-3 font-display text-lg font-bold text-maroon-600">Pending Queue</h2>
           <ul className="space-y-3">
             {pendingRequests.length === 0 && (
               <p className="text-sm text-ink-900/40">Nothing waiting on approval right now.</p>
             )}
-            {pendingRequests.slice(0, 6).map((r) => (
+            {(showAllPending ? pendingRequests : pendingRequests.slice(0, 6)).map((r) => (
               <li key={r.id} className="flex items-center justify-between text-sm">
                 <div>
                   <p className="font-medium text-ink-900">{r.employee?.full_name}</p>
@@ -93,10 +128,18 @@ export default function HRDashboard() {
               </li>
             ))}
           </ul>
+          {pendingRequests.length > 6 && (
+            <button
+              onClick={() => setShowAllPending((prev) => !prev)}
+              className="mt-4 text-xs font-medium text-maroon-600 hover:underline"
+            >
+              {showAllPending ? 'Show less' : 'Show more'}
+            </button>
+          )}
           {pendingRequests.length > 0 && (
             <Link
               to="/HRLeaveRequests"
-              className="mt-4 inline-block text-xs font-medium text-maroon-600 hover:underline"
+              className="mt-2 inline-block text-xs font-medium text-maroon-600 hover:underline"
             >
               Go to Leave Requests →
             </Link>

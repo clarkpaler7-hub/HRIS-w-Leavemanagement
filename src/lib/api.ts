@@ -132,4 +132,8 @@ export const api = {
     async markAllNotificationsRead() {
         return await request('POST', '/notifications/read-all');
     },
+
+    async clearAllNotifications() {
+        return await request('DELETE', '/notifications/clear-all');
+    },
 };

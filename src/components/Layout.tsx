@@ -6,6 +6,7 @@ import DesktopOnlyNotice from '@/components/DesktopOnlyNotice';
 import TccLogo from '@/Images/TccLogo.jpg';
 import type { Role } from '@/types';
 import NotificationBell from '@/components/NotificationBell';
+import UserMenu from '@/components/UserMenu';
 import {
   LayoutDashboard,
   Building2,
@@ -14,7 +15,6 @@ import {
   CalendarCheck,
   User,
   Menu,
-  LogOut,
 } from 'lucide-react';
 
 const adminNavItems = [
@@ -37,12 +37,6 @@ const hrNavItems = [
   { to: '/attendance', label: 'Attendance Monitoring', icon: Clock },
 ];
 
-const roleLabels: Record<string, string> = {
-  admin: 'Admin',
-  hr: 'Human Resource',
-  employee: 'Employee',
-};
-
 function navItemsFor(role: Role) {
   if (role === 'admin') return adminNavItems;
   if (role === 'hr') return hrNavItems;
@@ -50,7 +44,7 @@ function navItemsFor(role: Role) {
 }
 
 export default function Layout() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navItems = navItemsFor(user?.role ?? 'employee');
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
@@ -69,7 +63,7 @@ export default function Layout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-white dark:bg-ink-900">
+    <div className="flex h-screen overflow-hidden bg-white dark:bg-ink-900">
       {/* Backdrop, mobile only — closes the drawer when tapped outside it */}
       {isMobile && sidebarOpen && (
         <div
@@ -79,7 +73,7 @@ export default function Layout() {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 shrink-0 overflow-hidden border-r border-gold-300 bg-gold-50 text-ink-900 transition-all duration-300 ease-in-out dark:border-ink-700 dark:bg-ink-800 dark:text-white md:static md:z-auto ${
+        className={`fixed inset-y-0 left-0 z-40 shrink-0 overflow-hidden border-r border-gold-300 bg-gold-50 text-ink-900 shadow-lg transition-all duration-300 ease-in-out dark:border-ink-700 dark:bg-ink-800 dark:text-white md:static md:z-auto ${
           isMobile
             ? `w-64 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`
             : `translate-x-0 ${sidebarOpen ? 'w-64' : 'w-20'}`
@@ -130,41 +124,11 @@ export default function Layout() {
               </NavLink>
             ))}
           </nav>
-
-          <div
-            className={`border-t border-gold-300 px-4 py-5 dark:border-ink-700 ${
-              sidebarOpen ? '' : 'flex flex-col items-center px-2'
-            }`}
-          >
-            {sidebarOpen ? (
-              <>
-                <p className="text-sm font-medium text-ink-900 dark:text-white">{user?.name}</p>
-                <p className="mb-3 text-xs text-gold-700 dark:text-gold-400">
-                  {roleLabels[user?.role ?? ''] ?? user?.role}
-                </p>
-                <button
-                  onClick={logout}
-                  className="w-full rounded-md border border-ink-900/15 bg-transparent px-3 py-2 text-sm font-medium text-ink-900/70 transition-colors hover:border-maroon-400 hover:text-maroon-600 dark:border-white/15 dark:text-white/70 dark:hover:text-maroon-300"
-                >
-                  Sign out
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={logout}
-                title="Sign out"
-                aria-label="Sign out"
-                className="rounded-md border border-ink-900/15 bg-transparent p-2 text-ink-900/70 transition-colors hover:border-maroon-400 hover:text-maroon-600 dark:border-white/15 dark:text-white/70 dark:hover:text-maroon-300"
-              >
-                <LogOut aria-hidden className="h-4 w-4" />
-              </button>
-            )}
-          </div>
         </div>
       </aside>
 
       <main className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-[#faf9f7] dark:bg-ink-900">
-        <div className="flex items-center justify-between border-b border-gold-300 bg-white px-4 py-3 dark:border-ink-700 dark:bg-ink-800 sm:px-6">
+        <div className="relative z-10 flex items-center justify-between border-b border-gold-300 bg-white px-4 py-3 shadow-sm dark:border-ink-700 dark:bg-ink-800 sm:px-6">
           <button
             onClick={() => setSidebarOpen((prev) => !prev)}
             aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
@@ -173,9 +137,12 @@ export default function Layout() {
             <Menu aria-hidden className="h-5 w-5" />
           </button>
 
-          <NotificationBell />
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <UserMenu />
+          </div>
         </div>
-        <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 md:px-8 md:py-8">
+        <div className="w-full flex-1 px-4 py-6 sm:px-6 md:px-8 md:py-8">
           <Outlet />
         </div>
       </main>

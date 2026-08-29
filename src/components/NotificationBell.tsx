@@ -149,6 +149,17 @@ export default function NotificationBell() {
     }
   };
 
+  const clearAll = async () => {
+    const previous = notifications;
+    setNotifications([]);
+    try {
+      await api.clearAllNotifications();
+    } catch (err) {
+      console.error('Failed to clear notifications', err);
+      setNotifications(previous);
+    }
+  };
+
   return (
     <div ref={containerRef} className="relative">
       <button
@@ -170,14 +181,24 @@ export default function NotificationBell() {
             <h3 className="font-display text-sm font-bold text-ink-900 dark:text-white">
               Notifications
             </h3>
-            {unreadCount > 0 && (
-              <button
-                onClick={markAllRead}
-                className="text-xs font-medium text-maroon-600 hover:underline dark:text-maroon-300"
-              >
-                Mark all read
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllRead}
+                  className="text-xs font-medium text-maroon-600 hover:underline dark:text-maroon-300"
+                >
+                  Mark all read
+                </button>
+              )}
+              {notifications.length > 0 && (
+                <button
+                  onClick={clearAll}
+                  className="text-xs font-medium text-ink-900/50 hover:underline dark:text-white/50"
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
           </div>
 
           <ul className="max-h-80 overflow-y-auto">
