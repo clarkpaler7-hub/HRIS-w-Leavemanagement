@@ -133,7 +133,27 @@ export const api = {
         return await request('POST', '/notifications/read-all');
     },
 
-    async clearAllNotifications() {
+        async clearAllNotifications() {
         return await request('DELETE', '/notifications/clear-all');
+    },
+
+    // ---- Departments ----
+    async listDepartments() {
+        return await request('GET', '/departments');
+    },
+
+    async getDepartment(id: number) {
+        return await request('GET', `/departments/${id}`);
+    },
+
+    async createDepartment(payload: { name: string; description?: string; manager_id?: number | null }) {
+        return await request('POST', '/departments', payload);
+    },
+
+    async updateDepartment(
+        id: number,
+        payload: { name: string; description?: string; manager_id?: number | null }
+    ) {
+        return await request('PUT', `/departments/${id}`, payload);
     },
 };

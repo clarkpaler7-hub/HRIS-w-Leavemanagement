@@ -8,6 +8,7 @@ import Attendance from '@/pages/Admin/Attendance';
 import Dashboard from '@/pages/Admin/Dashboard';
 import Employees from '@/pages/Admin/Employees';
 import Departments from '@/pages/Admin/Departments';
+import DepartmentDetails from '@/pages/Admin/Departmentdetails';
 import Staff_Dashboard from '@/pages/Staff/Staff_Dashboard';
 import Staff_Attendance from '@/pages/Staff/Staff_Attendance';
 import Staff_Profile from '@/pages/Staff/Staff_Profile';
@@ -54,6 +55,14 @@ export default function App() {
               element={
                 <RoleRoute allow={['admin']}>
                   <Departments />
+                </RoleRoute>
+              } 
+            />
+            <Route 
+              path="departments/:id" 
+              element={
+                <RoleRoute allow={['admin']}>
+                  <DepartmentDetails />
                 </RoleRoute>
               } 
             />

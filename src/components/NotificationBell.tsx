@@ -51,24 +51,9 @@ const typeColors: Record<NotificationType, string> = {
   department_alert: 'text-gold-600 dark:text-gold-400',
 };
 
-// ---- Role-specific notification content ----
-//
-// Each role only sees notifications relevant to what they actually do in
-// this system — this mirrors the admin/HR split already enforced by
-// RoleRoute: admin never touches leave, HR only touches leave, employees
-// only see their own outcomes.
-//
-// TODO: replace `getMockNotificationsForRole` with a real fetch once the
-// backend notifications endpoint exists — e.g.:
-//   const data = await api.listNotifications();
-// The backend should already scope results to the authenticated user
-// (same pattern as /me/employee), so no role-branching would be needed
-// on the frontend at that point — this function goes away entirely and
-// `notifications` gets set directly from the response.
-//
-// These arrays are intentionally left empty for now — the bell, badge,
-// dropdown, and "mark all read" logic all still work, they just have
-// nothing to show until real data is wired in.
+// Notifications are fetched from the backend (scoped to the authenticated
+// user via auth()->id() in NotificationApiController), so no client-side
+// role branching is needed here — the same fetch works for every role.
 
 interface BackendNotification {
   id: number;

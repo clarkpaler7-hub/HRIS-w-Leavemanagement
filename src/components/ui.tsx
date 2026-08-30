@@ -4,7 +4,9 @@ import type { LucideIcon } from 'lucide-react';
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-lg border border-ink-900/10 bg-white p-5 shadow-sm ${className}`}>
+    <div
+      className={`rounded-2xl border border-white bg-gradient-to-b from-white to-[#f6f1e8] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(128,0,32,0.06),0_10px_24px_-8px_rgba(128,0,32,0.2)] ${className}`}
+    >
       {children}
     </div>
   );
@@ -30,7 +32,7 @@ export function StatCard({
           {hint && <p className="mt-1 text-xs text-ink-900/50">{hint}</p>}
         </div>
         {Icon && (
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-maroon-50 text-maroon-500">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-maroon-50 text-maroon-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),0_2px_4px_rgba(128,0,32,0.15)]">
             <Icon className="h-5 w-5" strokeWidth={2} />
           </span>
         )}
@@ -101,7 +103,7 @@ export function Modal({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/10 backdrop-blur-md p-4">
-      <div className="w-full max-w-lg rounded-lg border-t-4 border-t-gold-400 bg-white p-6 shadow-xl">
+      <div className="w-full max-w-lg rounded-2xl border border-white border-t-4 border-t-gold-400 bg-gradient-to-b from-white to-[#f6f1e8] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_16px_40px_-10px_rgba(128,0,32,0.35)]">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-display text-xl font-bold text-ink-900">{title}</h2>
           <button
@@ -133,7 +135,7 @@ export function RejectionReasonModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-lg border-t-4 border-t-gold-400 bg-white p-6 text-center shadow-xl"
+        className="w-full max-w-sm rounded-2xl border border-white border-t-4 border-t-gold-400 bg-gradient-to-b from-white to-[#f6f1e8] p-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_16px_40px_-10px_rgba(128,0,32,0.35)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border-2 border-ink-900">

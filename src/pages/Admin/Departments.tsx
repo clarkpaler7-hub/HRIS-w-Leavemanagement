@@ -1,33 +1,83 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { db } from '@/lib/db';
-import type { Department } from '@/types';
+import { useNavigate } from 'react-router-dom';
+import { api } from '@/lib/api';
 import { Button, Card, Modal } from '@/components/ui';
+import { Building2, Users } from 'lucide-react';
+
+const emptyForm = { id: null as number | null, name: '', description: '', manager_id: '' };
 
 export default function Departments() {
-  const [departments, setDepartments] = useState<Department[]>([]);
+  const navigate = useNavigate();
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [form, setForm] = useState({ name: '', code: '', description: '' });
+  const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState<string | null>(null);
 
-  const load = () => setDepartments(db.listDepartments());
+  const loadDepartments = async () => {
+    try {
+      const data = await api.listDepartments();
+      setDepartments(data);
+    } catch (err) {
+      console.error('Failed to load departments', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  useEffect(load, []);
+  const loadEmployees = async () => {
+    try {
+      const data = await api.listEmployees();
+      setEmployees(data);
+    } catch (err) {
+      console.error('Failed to load employees', err);
+    }
+  };
 
-  const handleSubmit = (e: FormEvent) => {
+  useEffect(() => {
+    loadDepartments();
+    loadEmployees();
+  }, []);
+
+  const openAddModal = () => {
+    setForm(emptyForm);
+    setError(null);
+    setModalOpen(true);
+  };
+
+  const openEditModal = (dept: any) => {
+    setForm({
+      id: dept.id,
+      name: dept.name,
+      description: dept.description ?? '',
+      manager_id: dept.manager?.id ? String(dept.manager.id) : '',
+    });
+    setError(null);
+    setModalOpen(true);
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!form.name || !form.code) {
-      setError('Name and code are required.');
-      return;
+
+    const payload = {
+      name: form.name,
+      description: form.description || undefined,
+      manager_id: form.manager_id ? Number(form.manager_id) : null,
+    };
+
+    try {
+      if (form.id) {
+        await api.updateDepartment(form.id, payload);
+      } else {
+        await api.createDepartment(payload);
+      }
+      setModalOpen(false);
+      loadDepartments();
+    } catch (err: any) {
+      setError(err.message || 'Failed to save department.');
     }
-    if (departments.some((d) => d.code.toLowerCase() === form.code.toLowerCase())) {
-      setError('That department code is already in use.');
-      return;
-    }
-    db.createDepartment(form);
-    setModalOpen(false);
-    setForm({ name: '', code: '', description: '' });
-    load();
   };
 
   return (
@@ -37,31 +87,58 @@ export default function Departments() {
           <h1 className="font-display text-3xl font-bold text-ink-900">Departments</h1>
           <p className="text-sm text-ink-900/50">Organizational structure</p>
         </div>
-        <Button onClick={() => setModalOpen(true)}>+ Add Department</Button>
+        <Button onClick={openAddModal}>+ Add Department</Button>
       </div>
 
+      {loading && <p className="text-sm text-ink-900/40">Loading departments...</p>}
+      {!loading && departments.length === 0 && (
+        <p className="text-sm text-ink-900/40">No departments yet.</p>
+      )}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {departments.length === 0 && <p className="text-sm text-ink-900/40">No departments yet.</p>}
         {departments.map((d) => (
-          <Card key={d.id}>
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="font-semibold text-ink-900">{d.name}</h3>
-                <p className="text-xs uppercase tracking-wide text-ink-900/40">{d.code}</p>
+          <Card key={d.id} className="flex flex-col">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-maroon-50">
+                <Building2 className="h-5 w-5 text-maroon-500" aria-hidden />
               </div>
-              <span className="rounded-full bg-maroon-50 px-2.5 py-1 text-xs font-medium text-maroon-600">
-                {d.employees_count ?? 0} staff
-              </span>
+              <div className="min-w-0">
+                <h3 className="truncate font-semibold text-ink-900">{d.name}</h3>
+                <p className="text-xs text-ink-900/50">
+                  Manager: {d.manager?.full_name ?? 'Unassigned'}
+                </p>
+              </div>
             </div>
-            {d.description && <p className="mt-2 text-sm text-ink-900/50">{d.description}</p>}
-            {d.manager && (
-              <p className="mt-3 text-xs text-ink-900/40">Manager: {d.manager.full_name}</p>
+
+            <div className="mt-3 flex items-center gap-1.5 text-xs text-ink-900/50">
+              <Users className="h-3.5 w-3.5" aria-hidden />
+              {d.employees_count ?? 0} employee{d.employees_count === 1 ? '' : 's'}
+            </div>
+
+            {d.description && (
+              <p className="mt-2 line-clamp-2 text-sm text-ink-900/60">{d.description}</p>
             )}
+
+            <div className="mt-4 flex gap-4 border-t border-ink-900/10 pt-3 text-sm font-medium">
+              <button
+                onClick={() => navigate(`/departments/${d.id}`)}
+                className="text-maroon-600 hover:underline"
+              >
+                View Details
+              </button>
+              <button onClick={() => openEditModal(d)} className="text-ink-900/60 hover:underline">
+                Edit
+              </button>
+            </div>
           </Card>
         ))}
       </div>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Add Department">
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={form.id ? 'Edit Department' : 'Add Department'}
+      >
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
             required
@@ -70,20 +147,25 @@ export default function Departments() {
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             className="w-full rounded-md border border-ink-900/15 px-3 py-2 text-sm"
           />
-          <input
-            required
-            placeholder="Code (e.g. ENG)"
-            value={form.code}
-            onChange={(e) => setForm({ ...form, code: e.target.value })}
-            className="w-full rounded-md border border-ink-900/15 px-3 py-2 text-sm"
-          />
           <textarea
-            placeholder="Description"
+            placeholder="Description (optional)"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             className="w-full rounded-md border border-ink-900/15 px-3 py-2 text-sm"
             rows={3}
           />
+          <select
+            value={form.manager_id}
+            onChange={(e) => setForm({ ...form, manager_id: e.target.value })}
+            className="w-full rounded-md border border-ink-900/15 px-3 py-2 text-sm"
+          >
+            <option value="">No manager assigned</option>
+            {employees.map((emp) => (
+              <option key={emp.id} value={emp.id}>
+                {emp.full_name}
+              </option>
+            ))}
+          </select>
           {error && <p className="text-sm text-maroon-600">{error}</p>}
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="secondary" onClick={() => setModalOpen(false)}>

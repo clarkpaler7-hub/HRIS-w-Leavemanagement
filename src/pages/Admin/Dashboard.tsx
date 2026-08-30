@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Users, Building2, UserX, UserCheck } from 'lucide-react';
 import { api } from '@/lib/api';
-import { Card, StatCard } from '@/components/ui';
+import { StatCard } from '@/components/ui';
 import { GreetingBanner } from '@/components/Greetingbanner';
 
 export default function Dashboard() {
@@ -40,10 +40,6 @@ export default function Dashboard() {
     const dept = emp.department || 'No Department';
     departmentMap[dept] = (departmentMap[dept] || 0) + 1;
   });
-  const employeesByDepartment = Object.entries(departmentMap).map(([name, count]) => ({
-    name,
-    employees_count: count,
-  }));
 
   return (
     <div className="space-y-6">
@@ -62,21 +58,6 @@ export default function Dashboard() {
         <StatCard label="Departments" value={Object.keys(departmentMap).length} icon={Building2} />
         <StatCard label="Today's Absent" value={absentToday} icon={UserX} />
         <StatCard label="Today's Present" value={presentToday} icon={UserCheck} />
-      </div>  
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-          <h2 className="mb-3 font-display text-lg font-bold text-maroon-600">
-            Employees by Department
-          </h2>
-          <ul className="space-y-2">
-            {employeesByDepartment.map((d) => (
-              <li key={d.name} className="flex items-center justify-between text-sm">
-                <span className="text-ink-900/70">{d.name}</span>
-                <span className="font-medium text-ink-900">{d.employees_count}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
       </div>
     </div>
   );

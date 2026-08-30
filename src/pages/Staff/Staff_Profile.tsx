@@ -61,7 +61,7 @@ export default function Staff_Profile() {
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
           <Field label="Employee No." value={employee.employee_number} />
           <Field label="Email" value={employee.email} />
-          <Field label="Department" value={employee.department ?? '—'} />
+          <Field label="Department" value={employee.department?.name ?? '—'} />
           <Field label="Position" value={employee.position ?? '—'} />
           <Field label="Hire Date" value={employee.date_hired} />
         </div>
