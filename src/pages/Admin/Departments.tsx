@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '@/lib/api';
+import { api } from '@/services/api';
 import { Button, Card, Modal } from '@/components/ui';
 import { Building2, Users } from 'lucide-react';
 

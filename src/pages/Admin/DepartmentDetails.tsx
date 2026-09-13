@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { api } from '@/lib/api';
+import { api } from '@/services/api';
 import { Button, Card, Modal, StatusBadge } from '@/components/ui';
 import { Building2, ArrowLeft } from 'lucide-react';
 

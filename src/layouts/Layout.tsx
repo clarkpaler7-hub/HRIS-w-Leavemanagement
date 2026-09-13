@@ -3,7 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import DesktopOnlyNotice from '@/components/DesktopOnlyNotice';
-import TccLogo from '@/Images/TccLogo.jpg';
+import TccLogo from '@/assets/images/TccLogo.jpg';
 import type { Role } from '@/types';
 import NotificationBell from '@/components/NotificationBell';
 import UserMenu from '@/components/UserMenu';

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Users, Building2, UserX, UserCheck } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api } from '@/services/api';
 import { StatCard } from '@/components/ui';
 import { GreetingBanner } from '@/components/Greetingbanner';
 

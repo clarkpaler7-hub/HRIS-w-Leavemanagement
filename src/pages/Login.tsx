@@ -2,8 +2,8 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui';
-import TccBG from '@/Images/TccBG.jpg';
-import TccLogo from '@/Images/TccLogo.jpg';
+import TccBG from '@/assets/images/TccBG.jpg';
+import TccLogo from '@/assets/images/TccLogo.jpg';
 
 export default function Login() {
   const { login } = useAuth();

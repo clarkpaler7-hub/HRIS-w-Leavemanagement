@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, Hourglass, Palmtree, CalendarPlus, ChevronRight } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api } from '@/services/api';
 import { Card, StatCard, Modal } from '@/components/ui';
 import { GreetingBanner } from '@/components/Greetingbanner';
 import { AttendanceTrendChart } from '@/components/AttendanceTrendChart';

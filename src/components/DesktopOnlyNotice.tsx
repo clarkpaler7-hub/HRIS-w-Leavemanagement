@@ -1,5 +1,5 @@
 import { Monitor } from 'lucide-react';
-import TccLogo from '@/Images/TccLogo.jpg';
+import TccLogo from '@/assets/images/TccLogo.jpg';
 import { useAuth } from '@/context/AuthContext';
 
 const roleLabels: Record<string, string> = {

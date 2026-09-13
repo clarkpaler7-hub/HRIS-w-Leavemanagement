@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { api } from '@/services/api';
 import { Button, Card, RejectionReasonModal, StatusBadge } from '@/components/ui';
 import { AlertCircle } from 'lucide-react';
 

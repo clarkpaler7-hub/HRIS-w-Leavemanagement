@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { api } from '@/services/api';
 import { Card, StatusBadge } from '@/components/ui';
 
 export default function StaffAttendance() {

@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { api } from '@/lib/api';
+import { api } from '@/services/api';
 import { Button, Card, Modal, RejectionReasonModal, StatusBadge } from '@/components/ui';
 
 export default function StaffLeaveRequests() {

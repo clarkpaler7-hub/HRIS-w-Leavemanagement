@@ -9,7 +9,7 @@ import {
   UserX,
   Building2,
 } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api } from '@/services/api';
 
 export type NotificationType =
   | 'leave_approved'

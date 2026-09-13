@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api } from '@/services/api';
 import type { EmploymentType } from '@/types';
 import { Button, Card, Modal, StatusBadge } from '@/components/ui';
 
