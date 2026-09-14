@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 
-// Matches Tailwind's `md` breakpoint — anything narrower counts as "mobile".
+// Matches Tailwind's `md` breakpoint — a narrow viewport counts as mobile.
 const MOBILE_BREAKPOINT = 768;
 
-// A phone's *shorter* dimension stays small whether it's held upright or
-// sideways (rotating just swaps which axis is which) — so checking the
-// smaller of width/height catches landscape phones/tablets too, unlike
-// checking width alone, which a landscape phone can easily exceed.
+// Responsive CSS is based on viewport width. Using the smaller screen
+// dimension incorrectly classifies common laptop resolutions (for example,
+// 1366×720) as mobile because their height is below the breakpoint.
 function computeIsMobile(breakpoint: number): boolean {
   if (typeof window === 'undefined') return false;
-  return Math.min(window.innerWidth, window.innerHeight) < breakpoint;
+  return window.innerWidth < breakpoint;
 }
 
 export function useIsMobile(breakpoint: number = MOBILE_BREAKPOINT): boolean {
