@@ -49,5 +49,5 @@ tests/
 └── system/
 ```
 
-The `src/utils/demoDb.ts` file is retained as an unused local-data utility for
-development reference. Production API requests use `src/services/api.ts`.
+Production API requests use `src/services/api.ts`. The application database is
+managed by the Laravel backend, not by this frontend repository.
